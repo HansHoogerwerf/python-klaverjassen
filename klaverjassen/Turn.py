@@ -1,4 +1,4 @@
-from PackOfCards import roem_order
+from Deck import roem_order
 from util import check_trump, get_highest_trump_card, get_highest_card_color, check_card
 
 
@@ -15,21 +15,21 @@ class Turn:
         self.players.append(player)
         self.cards.append(card)
 
-    def calculate_turn_points(self):
-        self.points = calculate_turn_points(self)
+    def calculate_turn_points(self, turn_number):
+        self.points = calculate_turn_points(self, turn_number)
         return self.points
 
     def turn_winner(self):
         self.winning_card = winning_card(self)
         self.winner = self.players[self.cards.index(self.winning_card)]
-        self.winner.points += self.points
-        self.players[(self.players.index(self.winner) + 2) % 4].points += self.points
 
 
-def calculate_turn_points(turn):
+def calculate_turn_points(turn, turn_number):
     points = 0
     for card in turn.cards:
         points += card.points
+    if turn_number is 7:
+        points += 10
     points += calculate_roem_points(turn)
     return points
 

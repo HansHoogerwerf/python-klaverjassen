@@ -1,4 +1,4 @@
-from PackOfCards import trump_order, normal_order
+from Deck import trump_order, normal_order
 
 
 def check_color(cards, color):

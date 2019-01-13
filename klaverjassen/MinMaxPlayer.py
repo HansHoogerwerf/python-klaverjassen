@@ -2,7 +2,26 @@ import Player
 from random import random
 
 
+# http://games.basicflow.net/klaverjas/ai.js
+class Playable:
+    def __init__(self, name):
+        self.max = []
+        self.min = []
+        self.diff = []
+        self.mean = []
+        self.risk = []
+
+    def add_new_card(self, card):
+        self.max.append(card)
+        self.min.append(card)
+        self.diff.append(card)
+        self.mean.append(card)
+        self.risk.append(card)
+
+
 class RandomPlayer(Player.Player):
+
+
     def __init__(self, name):
         super().__init__(name)
 
@@ -15,7 +34,15 @@ class RandomPlayer(Player.Player):
         return r > 0.75
 
     def choose_card(self, game, turn):
+        # Setup the playable cards and other info
+        playable = Playable()
+        allowed_cards = []
         for card in self.hand:
             if card.allowed:
-                return card
+                playable.add_new_card(card)
+        trump = game.trump
+        firstPlayer = turn.start_player
+
+
+
         return None

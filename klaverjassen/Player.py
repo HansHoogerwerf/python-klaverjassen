@@ -1,4 +1,8 @@
 class Player:
-    def __init__(self):
+    def __init__(self, name):
+        self.name = name
         self.hand = None
-        self.points = 0
+        self.team = None
+
+    def set_team(self, team):
+        self.team = team

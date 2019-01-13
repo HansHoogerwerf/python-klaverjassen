@@ -1,8 +1,8 @@
 from random import shuffle, choice
-
+from Team import Team
 import util
 from Card import Card
-from PackOfCards import values, colors
+from Deck import values, colors
 from Turn import Turn
 
 
@@ -12,27 +12,50 @@ class Game:
         self.trump = choice(colors)
         self.turns = []
         self.total_points = 0
+        self.teams = [Team(players[0], players[2]), Team(players[1], players[3])]
         create_hands(self.trump, self.players)
 
-    def play_game(self):
-        start_player = self.players[0]
+    def play_game(self, start_player):
+        challenger = None
+
+        while challenger is None:
+            challenger = find_challenger(self)
+            if challenger is None:
+                self.reshuffle()
+            else:
+                challenger.team.challengers = True
+
+        # if someone is challenging,  go play the hands
         for i in range(0, 8):
-            turn = self.play_turn(start_player)
+            turn = self.play_turn(start_player, i)
+            # add points to team
+
+            turn.winner.team.points += turn.points
+
             self.total_points += turn.points
             start_player = turn.winner
 
-        if self.players[0].points <= self.players[1].points:
-            self.players[1].points += self.players[0].points
-            self.players[3].points += self.players[0].points
-            self.players[0].points = 0
-            self.players[2].points = 0
+        # Calculate the score after a game. If the challenger team lost in points,
+        # all the points go to the non-challenger team.
+        # If the challenging team got all the points, give them 100 bonus points.
 
+        for i in range(0, len(self.teams)):
+            # Other team index
+            j = (i + 1) % 2
+            if self.teams[i].challengers and self.teams[j].points is 0:
+                self.teams[i].points += 100
+                break
+            elif self.teams[i].challengers and self.teams[i].points <= self.teams[j].points:
+                self.teams[j].points += self.teams[i].points
+                self.teams[i].points = 0
+                break
         return self
 
     def reshuffle(self):
+        self.trump = choice(colors)
         create_hands(self.trump, self.players)
 
-    def play_turn(self, start_player):
+    def play_turn(self, start_player, turn_number):
         turn = Turn(start_player)
         self.turns.append(turn)
         start_player_position = self.players.index(start_player)
@@ -44,7 +67,7 @@ class Game:
             player.hand.remove(card)
             reset_possibilities(player)
             turn.play_card(player, card)
-        turn.calculate_turn_points()
+        turn.calculate_turn_points(turn_number)
         turn.turn_winner()
 
         return turn
@@ -82,3 +105,10 @@ def set_possibilities(turn, player):
 
 def reset_possibilities(player):
     util.reset_possibilities(player)
+
+
+def find_challenger(game):
+    for player in game.players:
+        if player.challenge_hand():
+            return player
+    return None
