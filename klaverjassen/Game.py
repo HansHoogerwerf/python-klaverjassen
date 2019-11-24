@@ -25,15 +25,19 @@ class Game:
             else:
                 challenger.team.challengers = True
 
-        # if someone is challenging,  go play the hands
+        # if someone is challenging, go play the hands
         for i in range(0, 8):
             turn = self.play_turn(start_player, i)
             # add points to team
-
             turn.winner.team.points += turn.points
 
             self.total_points += turn.points
             start_player = turn.winner
+
+            # report the result of the hand to the players
+            print("\nHAND RESULTS")
+            for player in self.players:
+                player.hand_result(turn)
 
         # Calculate the score after a game. If the challenger team lost in points,
         # all the points go to the non-challenger team.
@@ -49,6 +53,10 @@ class Game:
                 self.teams[j].points += self.teams[i].points
                 self.teams[i].points = 0
                 break
+                # report the result of the hand to the players
+        print("\nGAME RESULTS")
+        for player in self.players:
+            player.game_result(self)
         return self
 
     def reshuffle(self):
@@ -109,6 +117,6 @@ def reset_possibilities(player):
 
 def find_challenger(game):
     for player in game.players:
-        if player.challenge_hand():
+        if player.challenge_hand(game):
             return player
     return None

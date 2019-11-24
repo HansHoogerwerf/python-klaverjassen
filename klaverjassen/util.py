@@ -5,7 +5,7 @@ def check_color(cards, color):
     for card in cards:
         if card.color is color:
             return True
-    return
+    return False
 
 
 def check_trump(cards):
